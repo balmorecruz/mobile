@@ -1,0 +1,139 @@
+
+
+package org.saram.modelo;
+
+public class CBPartner {
+	private Integer c_bpartner_id;
+	private String name;
+	private String name2;
+	private String chequenombre;
+	private String value;
+	private String taxid;
+	private Float so_creditused;
+	private Float so_creditlimit;
+	private String isactive;
+	private String iscustomer;
+	private String ispromocion;
+	/** 
+	 * Salesrep es el vendedor
+	 * **/
+	private Integer salesrep_id;
+	private Integer c_paymentterm_id;
+	private Integer m_pricelist_id;
+	private Integer lco_taxpayertype_id;
+	private Integer lco_isic_id;
+	private Integer t_clasificacion_id;
+	private Integer mas_pricelist_id;
+
+	public Integer getC_bpartner_id() {
+		return c_bpartner_id;
+	}
+	public void setC_bpartner_id(Integer c_bpartner_id) {
+		this.c_bpartner_id = c_bpartner_id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getName2() {
+		return name2;
+	}
+	public void setName2(String name2) {
+		this.name2 = name2;
+	}
+	public String getChequenombre() {
+		return chequenombre;
+	}
+	public void setChequenombre(String chequenombre) {
+		this.chequenombre = chequenombre;
+	}
+	public Float getSo_creditused() {
+		return so_creditused;
+	}
+	public void setSo_creditused(Float so_creditused) {
+		this.so_creditused = so_creditused;
+	}
+	public Float getSo_creditlimit() {
+		return so_creditlimit;
+	}
+	public void setSo_creditlimit(Float so_creditlimit) {
+		this.so_creditlimit = so_creditlimit;
+	}
+	public Integer getSalesrep_id() {
+		return salesrep_id;
+	}
+	public void setSalesrep_id(Integer salesrep_id) {
+		this.salesrep_id = salesrep_id;
+	}
+	public Integer getC_paymentterm_id() {
+		return c_paymentterm_id;
+	}
+	public void setC_paymentterm_id(Integer c_paymentterm_id) {
+		this.c_paymentterm_id = c_paymentterm_id;
+	}
+	public Integer getM_pricelist_id() {
+		return m_pricelist_id;
+	}
+	public void setM_pricelist_id(Integer m_pricelist_id) {
+		this.m_pricelist_id = m_pricelist_id;
+	}
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
+	}
+	public String getTaxid() {
+		return taxid;
+	}
+	public void setTaxid(String taxid) {
+		this.taxid = taxid;
+	}
+	public String getIsactive() {
+		return isactive;
+	}
+	public void setIsactive(String isactive) {
+		this.isactive = isactive;
+	}
+	public String getIscustomer() {
+		return iscustomer;
+	}
+	public void setIscustomer(String iscustomer) {
+		this.iscustomer = iscustomer;
+	}
+	public Integer getLco_taxpayertype_id() {
+		return lco_taxpayertype_id;
+	}
+	public void setLco_taxpayertype_id(Integer lco_taxpayertype_id) {
+		this.lco_taxpayertype_id = lco_taxpayertype_id;
+	}
+	public Integer getLco_isic_id() {
+		return lco_isic_id;
+	}
+	public void setLco_isic_id(Integer lco_isic_id) {
+		this.lco_isic_id = lco_isic_id;
+	}
+	public String getIspromocion() {
+		return ispromocion;
+	}
+	public void setIspromocion(String ispromocion) {
+		this.ispromocion = ispromocion;
+	}
+	public Integer getT_clasificacion_id() {
+		return t_clasificacion_id;
+	}
+	public void setT_clasificacion_id(Integer t_clasificacion_id) {
+		this.t_clasificacion_id = t_clasificacion_id;
+	}
+	public Integer getMas_pricelist_id() {
+		return mas_pricelist_id;
+	}
+	public void setMas_pricelist_id(Integer mas_pricelist_id) {
+		this.mas_pricelist_id = mas_pricelist_id;
+	}
+	
+	
+	
+}

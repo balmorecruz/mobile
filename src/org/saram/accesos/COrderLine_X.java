@@ -1,0 +1,538 @@
+package org.saram.accesos;
+
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.saram.controladores.HibernateUtil;
+import org.saram.modelo.CBPartner;
+import org.saram.modelo.COrder;
+import org.saram.modelo.COrderLine;
+import org.saram.modelo.MPriceList;
+import org.saram.modelo.MProduct;
+
+public class COrderLine_X implements COrderLine_I {
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<COrderLine> buscarTodos(Integer id) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_order_id", id))
+					.addOrder(Order.asc("c_charge_id")).addOrder(Order.asc("c_orderline_id"));
+			List<COrderLine> lista = crit.list();
+			sesion.close();
+			return lista;
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+
+	@Override
+	public Long salvarOrden(COrderLine col) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		Transaction tx = sesion.beginTransaction();
+		try {
+			sesion.saveOrUpdate(col);
+			tx.commit();
+			sesion.close();
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			sesion.saveOrUpdate(col);
+			tx.commit();
+		}
+		return null;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Integer buscarMaximo() {
+		Session sesion;
+		Integer value = 0;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).setProjection(Projections.max("c_orderline_id"));
+			List lista = crit.list();
+			sesion.close();
+			if (lista.get(0) != null) {
+				value = Integer.parseInt(lista.get(0).toString()) + 1;
+			}
+			return value;
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public COrderLine buscarUno(Integer id) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_orderline_id", id));
+			List<COrderLine> lista = crit.list();
+			sesion.close();
+			return lista == null || lista.isEmpty() ? null : lista.get(0);
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public COrderLine buscarQuotaAve(Integer id, Integer cc) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_order_id", id))
+					.add(Restrictions.eq("c_charge_id", cc));
+			List<COrderLine> lista = crit.list();
+			sesion.close();
+			return lista == null || lista.isEmpty() ? null : lista.get(0);
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public COrderLine buscarLineaDescuentoFlete(Integer id, Integer cc) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_order_id", id))
+					.add(Restrictions.eq("c_orderline_id_discount", cc));
+			List<COrderLine> lista = crit.list();
+			sesion.close();
+			return lista == null || lista.isEmpty() ? null : lista.get(0);
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+	public Long eliminarUno(Integer id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
+		try {
+			COrderLine col = buscarUno(id);
+			session.delete(col);
+			tx.commit();
+			session.close();
+			return null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			session.close();
+			return null;
+		}
+	}
+
+	public Long eliminarTodos(Integer COrderID) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
+		try {
+			String hql = "delete from COrderLine where c_order_id=" + COrderID;
+			Query query = session.createQuery(hql);
+			query.executeUpdate();
+			tx.commit();
+			session.close();
+			return null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			session.close();
+			return null;
+		}
+	}
+	@Override
+	public Long eliminarPromosEscalaMix(Integer COrderID) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
+		try {
+			String hql = "delete from COrderLine where (link_orderline_id is not null or ispromomix='Y' or link_orderline_id > 0) and  c_order_id=" + COrderID;
+			Query query = session.createQuery(hql);
+			query.executeUpdate();
+			tx.commit();
+			session.close();
+			return null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			session.close();
+			return null;
+		}
+	}
+	@Override
+	public Integer buscarTieneFlete(Integer id) {
+		Session sesion;
+		Integer fl = 0;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_order_id", id))
+					.add(Restrictions.isNotNull("c_charge_id")).addOrder(Order.asc("c_charge_id"))
+					.addOrder(Order.asc("c_orderline_id"));
+			@SuppressWarnings("unchecked")
+			List<COrderLine> lista = crit.list();
+			if (lista != null) {
+				fl = 0;
+			}
+			sesion.close();
+			return fl;
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Float sumarTodoQTY(Integer co) {
+		Session sesion;
+		Float qty = new Float(0.0);
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class)
+					// .setProjection((Projections.sum("qtyordered")))
+					.add(Restrictions.eq("c_order_id", co)).add(Restrictions.isNull("c_charge_id"));
+			List<COrderLine> lista = crit.list();
+			MProduct_X mpx = new MProduct_X();
+			MProduct mp = new MProduct();
+			for (COrderLine ol : lista) {
+				mp= mpx.buscarUno(ol.getM_product_id());
+				if (mp.getConversionqq()!=null&&mp.getConversionqq()!=0){
+					qty = ol.getQtyordered()*mp.getConversionqq() + qty;
+				} else {
+					qty = ol.getQtyordered() + qty;
+				}
+			}
+			sesion.close();
+			return qty;
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Float sumarTodoMonto(Integer co) {
+		Session sesion;
+		Float monto = new Float(0.0);
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class)
+					// .setProjection((Projections.sum("qtyordered")))
+					.add(Restrictions.eq("c_order_id", co));
+			List<COrderLine> lista = crit.list();
+			for (COrderLine ol : lista) {
+				monto = ol.getLinenetamt() + monto;
+			}
+			sesion.close();
+			return monto;
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Float sumarTodoMontoGrandTotal(Integer co) {
+		Session sesion;
+		Float monto = new Float(0.0);
+		Float montoCargos = new Float(0.0);
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_order_id", co));
+			List<COrderLine> lista = crit.list();
+			COrder_X cox = new COrder_X();
+			COrder c = new COrder();
+			c = cox.buscarUno(co);
+			MPriceList_X mplx = new MPriceList_X();
+			CBPartner_X cbx = new CBPartner_X();
+			CBPartner cb = new CBPartner();
+			cb = cbx.buscarUno(c.getC_bpartner_id());
+			MPriceList mpl = new MPriceList();
+			mpl = mplx.buscarUno(cb.getM_pricelist_id());
+			if (mpl.getIstaxincluded().equals("Y")) {
+				for (COrderLine ol : lista) {
+					monto = ol.getLinenetamt() + monto;
+				}
+			} else {
+				for (COrderLine ol : lista) {
+					if (ol.getC_charge_id() != null) {
+						if (ol.getC_charge_id() == 1004412) {
+							montoCargos = ol.getLinenetamt();
+						} else {
+							monto = ol.getLinenetamt() + monto;
+						}
+					} else {
+						monto = ol.getLinenetamt() + monto;
+					}
+				}
+				monto = monto * new Float(1.13);
+				monto = monto + montoCargos;
+			}
+			sesion.close();
+			return monto;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Float sumarTodoMontoGrandTotalSinAve(Integer co) {
+		Session sesion;
+		Float monto = new Float(0.0);
+		Float montoCargos = new Float(0.0);
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_order_id", co));
+			List<COrderLine> lista = crit.list();
+			COrder_X cox = new COrder_X();
+			COrder c = new COrder();
+			c = cox.buscarUno(co);
+			MPriceList_X mplx = new MPriceList_X();
+			CBPartner_X cbx = new CBPartner_X();
+			CBPartner cb = new CBPartner();
+			cb = cbx.buscarUno(c.getC_bpartner_id());
+			MPriceList mpl = new MPriceList();
+			mpl = mplx.buscarUno(cb.getM_pricelist_id());
+			if (mpl.getIstaxincluded().equals("Y")) {
+				for (COrderLine ol : lista) {
+					monto = ol.getLinenetamt() + monto;
+				}
+			} else {
+				for (COrderLine ol : lista) {
+					if (ol.getC_charge_id() != null) {
+						if (ol.getC_charge_id() == 1004412) {
+//							montoCargos = ol.getLinenetamt();
+						} else {
+							monto = ol.getLinenetamt() + monto;
+						}
+					} else {
+						monto = ol.getLinenetamt() + monto;
+					}
+				}
+				monto = monto * new Float(1.13);
+				monto = monto + montoCargos;
+			}
+			sesion.close();
+			return monto;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public COrderLine buscarPromocion(Integer mp, Integer co) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("m_product_id", mp))
+					.add(Restrictions.le("priceactual", new Float(0.02))).add(Restrictions.eq("c_order_id", co))
+					.add(Restrictions.isNull("link_orderline_id"));
+			List<COrderLine> lista = crit.list();
+			return lista.size() > 0 ? lista.get(0) : null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Boolean buscarProductoIngresado(Integer mp, Integer co) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("c_order_id", co)).add(Restrictions.eq("m_product_id", mp)).add(Restrictions.isNull("espromocion"));
+			List<COrderLine> lista = crit.list();
+			sesion.close();
+			if (lista.size()>0) return true; else return false;
+		} catch (Exception e) {
+			sesion.close();
+			return false;
+		}
+	}
+
+	@Override
+	public List<COrderLine> buscarlineasPromo(Integer mp, Integer co) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrderLine.class).add(Restrictions.eq("m_product_id", mp))
+					.add(Restrictions.le("priceactual", new Float(0.02))).add(Restrictions.eq("c_order_id", co));
+			List<COrderLine> lista = crit.list();
+			return lista.size() > 0 ? lista : null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+
+	@Override
+	public List<COrderLine> buscarlineasPromoEscala(Integer corderid) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Query query=sesion.createQuery(
+					"from COrderLine where m_product_id in (1001569, 1002867,100151, 1000680) and c_order_id = :id and link_orderline_id is null and (ispromomix='N' or ispromomix is null)");
+					query.setParameter("id", corderid);	
+			List<COrderLine> lista = query.list();
+			sesion.close();
+			return lista.size() > 0 ? lista : null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	@Override
+	public List<COrderLine> buscarlineaPromoMix(Integer corderid) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Query query=sesion.createQuery(
+					"from COrderLine where   c_order_id = :id and ispromomix='Y'");
+					query.setParameter("id", corderid);	
+			List<COrderLine> lista = query.list();
+			sesion.close();
+			return lista.size() > 0 ? lista : null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	@Override
+	public  Double getSumProductosEscala(Integer c_order_id) {
+		Session sesion;
+		Double totalOrdered=0.0;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		
+		Query query =  sesion.createQuery("SELECT sum(qtyordered) from COrderLine where m_product_id in (1001569, 1002867,100151, 1000680) and c_order_id = :id and link_orderline_id is null and (ispromomix='N' or ispromomix is null)");
+			query.setParameter("id", c_order_id);
+		 totalOrdered=(Double)	query.uniqueResult();
+		 return totalOrdered;
+		
+	}
+	@Override
+	public Long eliminarPromosEscala(Integer COrderID) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
+		try {
+			String hql = "delete from COrderLine where (link_orderline_id is not null  or link_orderline_id > 0) and  c_order_id=" + COrderID;
+			Query query = session.createQuery(hql);
+			query.executeUpdate();
+			tx.commit();
+			session.close();
+			return null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			session.close();
+			return null;
+		}
+	}
+	@Override
+	public Long eliminarLineasDescuentoFlete(Integer COrderID) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
+		try {
+			String hql = "delete from COrderLine where (c_orderline_id_discount is not null  or c_orderline_id_discount > 0) and  c_order_id=" + COrderID;
+			Query query = session.createQuery(hql);
+			query.executeUpdate();
+			tx.commit();
+			session.close();
+			return null;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			session.close();
+			return null;
+		}
+	}
+}

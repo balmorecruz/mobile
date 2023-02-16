@@ -1,0 +1,355 @@
+package org.saram.controladores;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.saram.accesos.CBPartner_X;
+import org.saram.accesos.COrderLine_X;
+import org.saram.accesos.COrder_X;
+import org.saram.accesos.MProduct_X;
+import org.saram.accesos.sqlHQL_X;
+import org.saram.modelo.CBPartner;
+import org.saram.modelo.COrder;
+import org.saram.modelo.COrderLine;
+import org.saram.modelo.MProduct;
+
+@SuppressWarnings("serial")
+@WebServlet(name = "completarPedido", urlPatterns = {"/completarPedido"})
+public class completarPedido extends HttpServlet {
+
+	public completarPedido() {
+		super();
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		PrintWriter out = response.getWriter();
+		out.println("PROCESANDO POR FAVOR ESPERE...");
+		try {
+			COrder_X cox = new COrder_X();
+			String adId = request.getParameter("ad_user_id");
+			String cOrderID;
+			String c_bpartner_id = request.getParameter("c_bpartner_id");
+			if (request.getParameter("c_order_id") == null) {
+				cOrderID = "";
+			} else {
+				cOrderID = request.getParameter("c_order_id");
+			}
+			List<COrder> coDetenido = cox.buscarUnoDetenido(adId, cOrderID);
+			if (coDetenido.size() > 0) {
+				request.getRequestDispatcher("pedido").forward(request, response);
+			} else {
+				if (request.getParameter("completarPedido") != null) {
+					COrder co = new COrder();
+					COrderLine_X cp = new COrderLine_X();
+
+					COrder_X cx = new COrder_X();
+					sqlHQL_X sqlx = new sqlHQL_X();
+					List<COrderLine> adl = cp.buscarTodos(Integer.parseInt(cOrderID));
+					if (request.getParameter("aprobarcredito").length() <= 1) {
+						String comentario = co.getDescription() + ". El comentario del vendedor fue: "
+								+ request.getParameter("aprobarcredito");
+						co.setDescription(comentario);
+					}
+					co = cox.buscarUno(cOrderID == null ? 0 : Integer.parseInt(cOrderID));
+					if (co.getDocstatus().equals("CO")) {
+						request.getRequestDispatcher("/acceso?ad_user_id=" + adId).forward(request, response);
+					} else {
+						co.setDocstatus("IN");
+						co.setDocaction("CO");
+						co.setProcessed("N");
+						co.setEsdeudor("Y");
+						cx.salvarOrden(co);
+						String mensaje;
+						CBPartner cb = new CBPartner();
+						CBPartner_X cbx = new CBPartner_X();
+						cb = cbx.buscarUno(Integer.parseInt(c_bpartner_id));
+						String newLine = System.getProperty("line.separator");
+						DecimalFormat dfF = new DecimalFormat("###,###,##0.00");
+						List<Object> CBPartnerUser = sqlx.buscarUno(
+								"SELECT name FROM C_BPartner where C_BPartner_ID = (SELECT C_BPartner_ID FROM Ad_user WHERE Ad_user_ID = "
+										+ adId + ")");
+						String vendedor = CBPartnerUser.get(0).toString();
+						List<Object> CBPartnerUserMail = sqlx
+								.buscarUno("SELECT max(email) FROM Ad_user WHERE Ad_user_ID = " + adId + "");
+						String email = "";
+						try {
+							email = CBPartnerUserMail.get(0).toString();
+						} catch (Exception e) {
+							email = "";
+						}
+						String mensaje2 = "";
+						if (co.getDescription().equals(", CREADO DESDE EL SISTEMA MOVIL PECUARIO")) {
+							mensaje2 = "Por favor verificar el pedido del cliente: " + cb.getName()
+									+ "\r\n\r\nCodigo de pedido: " + co.getDocumentno()
+									+ "\r\n\r\nDescripcion de pedido: SIN DESCRIPCION\r\n\r\nGenerado por: " + vendedor
+									+ "\r\n\r\nESTE PEDIDO SE ENCUENTRA EN ETAPA DE APROBACION POR CREDITOS Y COBROS ";
+							if (request.getParameter("aprobarcredito").length() <= 1) {
+								mensaje = "POR FAVOR VERIFICAR EL PEDIDO DEL CLIENTE $" + cb.getName() + " " + newLine
+										+ "\r\n\r\nCREDITO APROBADO: $" + cb.getSo_creditlimit()
+										+ "\r\n\r\nPARA EL NUMERO DE DOCUMENTO " + co.getDocumentno()
+										+ "\r\n\r\nMONTO VENCIDO: " + request.getParameter("montoven")
+										+ "\r\n\r\nMONTO EXCEDIDO " + request.getParameter("montoex")
+										+ "\r\n\r\nTOTAL DEL PEDIDO $" + dfF.format(co.getGrandtotal())
+										+ "\r\n\r\nDESCRIPCION DEL PEDIDO (SIN DESCRIPCION)"
+										+ "\r\n\r\nGENERADO POR EL VENDODR " + vendedor;
+							} else {
+								mensaje = "POR FAVOR VERIFICAR EL PEDIDO DEL CLIENTE " + cb.getName() + " " + newLine
+										+ "\r\nCREDITO APROBADO: $" + cb.getSo_creditlimit()
+										+ "\r\n\r\nPARA EL NUMERO DE DOCUMENTO " + co.getDocumentno()
+										+ "\r\n\r\nMONTO VENCIDO: " + request.getParameter("montoven")
+										+ "\r\n\r\nMONTO EXCEDIDO " + request.getParameter("montoex")
+										+ "\r\n\r\nTOTAL DEL PEDIDO $" + dfF.format(co.getGrandtotal())
+										+ "\r\n\r\nDESCRIPCION DEL PEDIDO (SIN DESCRIPCION)"
+										+ "\r\n\r\nGENERADO POR EL VENDODR " + vendedor
+										+ "\r\n\r\nEL COMENTARIO DEL VENDEDOR FUE "
+										+ request.getParameter("aprobarcredito").replaceAll("\n", "");
+							}
+						} else {
+							mensaje2 = "Por favor verificar el pedido del cliente: " + cb.getName()
+									+ "\r\n\r\nCodigo de pedido: " + co.getDocumentno() + "\r\n\r\nDescripcion de pedido: "
+									+ co.getDescription() + "\r\n\r\nGenerado por: " + vendedor
+									+ "\r\n\r\nESTE PEDIDO SE ENCUENTRA EN ETAPA DE APROBACION POR CREDITOS Y COBROS ";
+							if (request.getParameter("aprobarcredito").length() <= 1) {
+								mensaje = "POR FAVOR VERIFICAR EL PEDIDO DEL CLIENTE $" + cb.getName() + " " + newLine
+										+ "\r\n\r\nCREDITO APROBADO: $" + cb.getSo_creditlimit()
+										+ "\r\n\r\nPARA EL NUMERO DE DOCUMENTO " + co.getDocumentno()
+										+ "\r\n\r\nMONTO VENCIDO: " + request.getParameter("montoven")
+										+ "\r\n\r\nMONTO EXCEDIDO " + request.getParameter("montoex")
+										+ "\r\n\r\nTOTAL DEL PEDIDO $" + dfF.format(co.getGrandtotal())
+										+ "\r\n\r\nDESCRIPCION DEL PEDIDO " + co.getDescription()
+										+ "\r\n\r\nGENERADO POR EL VENDODR " + vendedor;
+							} else {
+								mensaje = "POR FAVOR VERIFICAR EL PEDIDO DEL CLIENTE " + cb.getName() + " " + newLine
+										+ "\r\nCREDITO APROBADO: $" + cb.getSo_creditlimit()
+										+ "\r\n\r\nPARA EL NUMERO DE DOCUMENTO " + co.getDocumentno()
+										+ "\r\n\r\nMONTO VENCIDO: " + request.getParameter("montoven")
+										+ "\r\n\r\nMONTO EXCEDIDO " + request.getParameter("montoex")
+										+ "\r\n\r\nTOTAL DEL PEDIDO $" + dfF.format(co.getGrandtotal())
+										+ "\r\n\r\nDESCRIPCION DEL PEDIDO " + co.getDescription()
+										+ "\r\n\r\nGENERADO POR EL VENDODR " + vendedor
+										+ "\r\n\r\nEL COMENTARIO DEL VENDEDOR FUE "
+										+ request.getParameter("aprobarcredito").replaceAll("\n", "");
+							}
+						}
+						if (!co.getEscorreoenviadocyb().equals("Y")) {
+							enviarCorreos(mensaje, "jefecreditoscobros@mor.com.sv", "creditos@mor.com.sv",
+									"cobros@mor.com.sv", "notificaciones.informatica@mor.com.sv", email);
+//							 enviarCorreos(mensaje,"informatica1@mor.com.sv","analistadesistemas@mor.com.sv","","","");
+						}
+						co.setEscorreoenviadocyb("Y");
+						try {
+							if (!co.getEscorreoenviado().equals("Y")) {
+								if (adId.equals("1000601") || adId.equals("1000602") || adId.equals("100189")) {
+									enviarCorreos(mensaje2, "pedidos@mor.com.sv", "notificaciones.informatica@mor.com.sv",
+											"ventasconavigan@gmail.com", "conavigan@gmail.com", email);
+//									 enviarCorreos(mensaje2,"ventasconavigan@gmail.com","julissa.menjivar@mor.com.sv","conavigan@gmail.com","","");
+								} else {
+									enviarCorreos(mensaje2, "pedidos@mor.com.sv", "notificaciones.informatica@mor.com.sv",
+											"", "", email);
+//									 enviarCorreos(mensaje2,"informatica1@mor.com.sv","analistadesistemas@mor.com.sv","","","");
+								}
+							}
+							co.setEscorreoenviado("Y");
+						} catch (Exception e) {
+							// enviarCorreos(mensaje2,"pedidos@mor.com.sv","notificaciones.informatica@mor.com.sv","","",email);
+						}
+						// enviarCorreos(mensaje2,
+						// "informatica1@mor.com.sv","notificaciones.informatica@mor.com.sv","","","");
+						MProduct mp = new MProduct();
+						cx.salvarOrden(co);
+						MProduct_X mpx = new MProduct_X();
+						for (COrderLine coi : adl) {
+							List<Object> qtyDisponibles;
+							Double qtyDisponible;
+							String stringQtyDisponible;
+							if (coi.getM_product_id() != null) {
+								qtyDisponibles = sqlx.buscarUno("select sum(qtyonhand) - bomqtyreserved("
+										+ coi.getM_product_id() + "," + "" + coi.getM_warehouse_id()
+										+ ",0.0) from m_storage WHERE m_product_id =" + coi.getM_product_id());
+								stringQtyDisponible = qtyDisponibles.get(0).toString().replace("[", "").replace("]", "");
+								if (stringQtyDisponible != null) {
+									qtyDisponible = new Double(stringQtyDisponible);
+								} else {
+									qtyDisponible = new Double(1.0);
+								}
+								if (qtyDisponible <= 0) {
+									mp = mpx.buscarUno(coi.getM_product_id());
+									String mensajeDisponibilidad = "Para el pedido " + co.getDocumentno()
+											+ " no se cuenta con suficiente disponibilidad para el " + "producto "
+											+ mp.getName() + " con codigo " + mp.getValue();
+									if (!co.getEscorreoenviadop().equals("Y")) {
+										enviarCorreos(mensajeDisponibilidad, "planeacion@mor.com.sv",
+												"notificaciones.informatica@mor.com.sv", "pedidos@mor.com.sv", "", "");
+//										 enviarCorreos(mensajeDisponibilidad,"informatica1@mor.com.sv","analistadesistemas@mor.com.sv","","","");
+										co.setEscorreoenviadop("Y");
+										cx.salvarOrden(co);
+									}
+								}
+							}
+
+						}
+						/**
+						 * FIN ENVIO DE CORREOS
+						 **/
+						// Redireccionamos pagina
+						request.getRequestDispatcher("/pedido_c.jsp?solicitud=1&ad_user_id=" + adId + "&c_bpartner_id="
+								+ c_bpartner_id + "&c_order_id=" + cOrderID).forward(request, response);
+					}
+					
+				} else {
+					// retornar a la pagina de pedido linea
+					request.getRequestDispatcher("/busquedaPedidos?ad_user_id=" + adId + "&c_bpartner_id="
+							+ c_bpartner_id + "&c_order_id=" + cOrderID).forward(request, response);
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Error se debe crear una pagina de errores" + e.toString());
+		}
+	}
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		/*** Saram ***/
+	}
+
+	private static final String PATTERN_EMAIL = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+	public static boolean validateEmail(String email) {
+		Pattern pattern = Pattern.compile(PATTERN_EMAIL);
+		Matcher matcher = pattern.matcher(email);
+		return matcher.matches();
+	}
+	public boolean enviarCorreos2(String texto, String correo, String copia1, String copia2, String copia3,
+			String email) {
+		return true;
+	}
+//	public boolean enviarCorreos(String texto, String correo, String copia1, String copia2, String copia3,
+//			String email) {
+//		String para = correo;
+//		String de = "notificaciones.informatica@mor.com.sv";
+//		if (validateEmail(email))
+//			de = email;
+//		String host = "HEFESTA.saram.com";
+//		Properties propiedades = System.getProperties();
+//		propiedades.setProperty("mail.transport.protocol", "smtp");
+//		propiedades.setProperty("mail.smtp.host", host);
+//		propiedades.setProperty("mail.smtp.auth", "true");
+//		Authenticator authenticator = new Authenticator() {
+//			protected PasswordAuthentication getPasswordAuthentication() {
+//				return new PasswordAuthentication("informatica1", "12345678");
+//			}
+//		};
+//		propiedades.setProperty("mail.port", "26");
+//		Session sesion = Session.getDefaultInstance(propiedades, authenticator);
+//		try {
+//			MimeMessage mensaje = new MimeMessage(sesion);
+//			mensaje.setFrom(new InternetAddress(de));
+//			mensaje.setSubject(
+//					"**PEDIDO GENERADO POR EL SISTEMA MOVIL** SOLICITUD DE APROBACION NOTIFICACION DE PEDIDOS CLIENTE EN ESPERA");
+//			mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress("<" + para + ">"));
+//			mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress("<" + copia1 + ">"));
+//			if (copia2.length() > 1) {
+//				mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress(copia2));
+//			}
+//			if (copia3.length() > 1) {
+//				mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress(copia3));
+//			}
+////			//Descomentar si da clavo el correo
+////			mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress("gestorpedidos01.saram@gmail.com"));
+////			mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress("gestion.pedidos.saram@gmail.com"));
+////			mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress("josecastanedasv@gmail.com"));
+////			mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress("vato8263@gmail.com"));
+//			// Now set the actual message
+//			mensaje.setText(texto);
+//			// mensaje.setContentLanguage(languages);
+//			// Enviamos el correo
+//			Transport.send(mensaje);
+//			return true;
+//		} catch (MessagingException e) {
+//			return false;
+//		}
+//	}
+	public boolean enviarCorreos(String texto, String correo, String copia1, String copia2, String copia3,
+			String email) {
+		String para = correo;
+		String de = "notificaciones.saram@gmail.com";
+		final String fromEmail = "notificaciones.saram@gmail.com"; // requires valid gmail id
+		final String password = "wrsetoelfcklybpl"; // correct password for gmail id
+		if (validateEmail(email))
+			de = email;
+		Properties props = new Properties();
+		props.put("mail.smtp.host", "smtp.gmail.com"); // SMTP Host
+		props.put("mail.smtp.port", "587"); // TLS Port
+		props.put("mail.smtp.auth", "true"); // enable authentication
+		props.put("mail.smtp.starttls.enable", "true"); // enable STARTTLS
+
+		Authenticator authenticator = new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(fromEmail, password);
+			}
+		};
+		Session sesion = Session.getDefaultInstance(props, authenticator);
+		try {
+			MimeMessage mensaje = new MimeMessage(sesion);
+			mensaje.setFrom(new InternetAddress(de));
+			mensaje.setSubject(
+					"**PEDIDO GENERADO POR EL SISTEMA MOVIL** SOLICITUD DE APROBACION NOTIFICACION DE PEDIDOS CLIENTE EN ESPERA");
+			mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress("<" + para + ">"));
+			mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress("<" + copia1 + ">"));
+			mensaje.addRecipient(Message.RecipientType.CC,
+					new InternetAddress("<" + "analistadesistemas@mor.com.sv" + ">"));
+			mensaje.addRecipient(Message.RecipientType.CC,
+					new InternetAddress("<" + "analista@mor.com.sv" + ">"));
+			mensaje.addRecipient(Message.RecipientType.CC,
+					new InternetAddress("<" + "asociados@mor.com.sv" + ">"));
+			if (copia2.length() > 1) {
+				mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress(copia2));
+			}
+			if (copia3.length() > 1) {
+				mensaje.addRecipient(Message.RecipientType.CC, new InternetAddress(copia3));
+			}
+			// //Descomentar si da clavo el correo
+			// mensaje.addRecipient(Message.RecipientType.TO, new
+			// InternetAddress("gestorpedidos01.saram@gmail.com"));
+			// mensaje.addRecipient(Message.RecipientType.CC, new
+			// InternetAddress("gestion.pedidos.saram@gmail.com"));
+			// mensaje.addRecipient(Message.RecipientType.CC, new
+			// InternetAddress("josecastanedasv@gmail.com"));
+			// mensaje.addRecipient(Message.RecipientType.CC, new
+			// InternetAddress("vato8263@gmail.com"));
+			// Now set the actual message
+			mensaje.setText(texto);
+			// mensaje.setContentLanguage(languages);
+			// Enviamos el correo
+			Transport.send(mensaje);
+			System.out.println("MENSAJE ENVIADO");
+			return true;
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		}
+	}
+
+    	
+}

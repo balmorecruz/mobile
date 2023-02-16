@@ -1,0 +1,447 @@
+<%@page contentType="text/html" import="java.util.*"%>
+<%@page contentType="text/html" import="java.util.Date"%>
+<%@page contentType="text/html" import="java.util.Calendar"%>
+<%@page contentType="text/html" import="org.saram.accesos.MWareHouse_X"%>
+<%@page contentType="text/html" import="org.saram.modelo.MWareHouse"%>
+<%@page contentType="text/html" import="org.saram.accesos.CBPartner_X"%>
+<%@page contentType="text/html" import="org.saram.modelo.CBPartner"%>
+<%@page contentType="text/html" import="java.nio.charset.Charset"%>
+<%@page contentType="text/html" import="javax.servlet.http.HttpServlet"%>
+<%@page contentType="text/html"
+	import="javax.servlet.http.HttpServletRequest"%>
+<%@page contentType="text/html"
+	import="javax.servlet.http.HttpServletResponse"%>
+<%@page contentType="text/html" import="java.net.URLDecoder"%>
+<%@page contentType="text/html"
+	import="org.saram.accesos.CBPartnerLocation_X"%>
+<%@page contentType="text/html"
+	import="org.saram.modelo.CBPartnerLocation"%>
+<%@page contentType="text/html" import="org.saram.accesos.sqlHQL_X"%>
+<%@page contentType="text/html"
+	import="javax.servlet.http.HttpServletRequest"%>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Pedido</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>Inicio</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/iui/iui.css" type="text/css" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/recursos/saram.css"
+	type="text/css" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/iui/t/default/default-theme.css"
+	type="text/css" />
+<script type="application/x-javascript"
+	src="${pageContext.request.contextPath}/iui/iui.js"></script>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/calendar.js"
+	language="JavaScript1.2"></script>
+<link href="${pageContext.request.contextPath}/css/calendar-blue.css"
+	type="text/css" rel="stylesheet" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/bootstrap-theme.css"
+	crossorigin="anonymous">
+<meta name="viewport"
+	content="width=device-width; initial-scale=1.0; minimum-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+</head>
+<%!protected void utf8(String dato, javax.servlet.jsp.JspWriter out) {
+		try {
+			CBPartner_X cbx = new CBPartner_X();
+			CBPartner cb = new CBPartner();
+			cb = cbx.buscarUno(Integer.parseInt(dato));
+			out.println(cb.getName());
+		} catch (java.io.IOException e1) {
+			System.out.println(e1);
+		}
+	}%>
+	<script type="text/javascript">
+function validar(e) { // 1
+    tecla = (document.all) ? e.keyCode : e.which; // 2
+    if (tecla==8) return true; // 3
+    patron =/[A-Za-z0-9\s]/; // 4
+    te = String.fromCharCode(tecla); // 5
+    return patron.test(te); // 6
+}
+</script>
+<body >
+	<form id="screen1" title="Pedido" class="panel" name="formname"
+		action="${pageContext.request.contextPath}/pedidoIngreso?ad_user_id=<%=request.getParameter("ad_user_id")%>"
+		method="post" selected="true" autocomplete="off">
+		<fieldset>
+			<div class="row">
+				<label id="POReferenceL" for="POReferenceF"
+					title="N&uacute;mero de referencia de de la transacci&oacute;n (Orden de Venta; Orden de Compra) de su Socio del Negocio)">
+					Tipo Documento </label> <input id="POReferenceF" disabled="true"
+					value="Pedido" name="documenttype" maxlength="20" type="text" />
+			</div>
+			<div class="row">
+				<label id="POReferenceL" for="POReferenceF"
+					title="N&uacute;mero de referencia de de la transacci&oacute;n (Orden de Venta; Orden de Compra) de su Socio del Negocio)">
+					No. del Documento </label> <input id="documentno"
+					value="Guarde el Documento" disabled="true" name="documentno"
+					maxlength="20" type="text" />
+			</div>
+			<div class="row">
+				<label id="AD_Client_IDL"
+					title="Compa&ntilde;&iacute;a para esta instalaci&oacute;n"
+					class="mandatory" for="AD_Client_IDF"> Cliente: </label> <input
+					id="C_BPartner_ID" name="C_BPartner_ID"
+					value="<%=request.getParameter("cb_partner_id")%>"
+					name="C_BPartner_ID" type="hidden" /> <input name="ad_user_id"
+					id="ad_user_id" value="<%=request.getParameter("ad_user_id")%>"
+					type="text" disabled="false" /> <input id="nameco"
+					value="<%utf8(request.getParameter("cb_partner_id"), out);%>"
+					name="nameco" type="text" disabled="true" />
+
+			</div>
+			<div class="row">
+				<label id="DateOrderedL" for="DateOrderedF"
+					title="Fecha de la orden"> Fecha requerida </label>
+				<div class="fieldValue">
+					<%
+						java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd");
+					%>
+					<%
+						String date = df.format(new Date());
+					%>
+					<input type="date" value="<%=date%>" id="DateOrdered"
+						name="DateOrdered" />
+				</div>
+			</div>
+			<%--
+			<div class="row">
+				<label id="DatePromisedL" for="DatePromisedF"
+					title="Fecha de promesa de la orden."> Fecha Prometida </label>
+				<div class="fieldValue">
+				 <%java.text.DateFormat df = new java.text.SimpleDateFormat("yyyy-MM-dd"); %>
+				 <%String date = df.format(new Date()); %>
+					<input type="date"  value = "<%=date %>" id="fechaOrden" />
+				</div>
+			</div>
+			 --%>
+			<div class="row">
+				<label id="C_BPartner_Location_IDL" for="C_BPartner_Location_IDF"
+					title="Identifica la direcci&oacute;n para este tercero">
+					Direcci&oacute;n del Cliente </label> <select name="c_bpartner_location_id"
+					id="c_bpartner_location_id">
+					<%!private void menuLocaciones(javax.servlet.jsp.JspWriter out, String request) {
+		try {
+			CBPartnerLocation_X locImp = new CBPartnerLocation_X();
+			Integer cb = 0;
+			if (request != null) {
+				cb = Integer.parseInt(request);
+			}
+			List<CBPartnerLocation> loc = locImp.buscarTodos(cb);
+			Integer i = 0;
+			for (CBPartnerLocation l : loc) {
+				i++;
+				if (i == 1) {
+					out.println("<option value=\"" + l.getC_bpartner_location_id() + "\"selected>" + l.getName()
+							+ "</option>");
+				} else {
+					out.println("<option value=\"" + l.getC_bpartner_location_id() + "\">" + l.getName() + "</option>");
+				}
+			}
+			if (i == 0) {
+				out.println("<option value=\"-1\" selected> No se le ha registrado una direccion</option>");
+			}
+		} catch (java.io.IOException e1) {
+			System.out.println(e1);
+		}
+	}%>
+					<%!private void menuLocacionesEnvio(javax.servlet.jsp.JspWriter out, String request) {
+		try {
+			CBPartnerLocation_X locImp = new CBPartnerLocation_X();
+			Integer cb = 0;
+			if (request != null) {
+				cb = Integer.parseInt(request);
+			}
+			List<CBPartnerLocation> loc = locImp.buscarTodos(cb);
+			Integer i = 0;
+			out.println("<option value=\"-1\" selected></option>");
+			//out.println("<option value=\"0\">Entrega en SARAM</option>");
+			out.println("<option value=\"999999\">Entrega en SARAM</option>");
+
+			for (CBPartnerLocation l : loc) {
+				i++;
+				out.println("<option value=\"" + l.getC_bpartner_location_id() + "\">" + l.getName() + "</option>");
+			}
+			if (i == 0) {
+				out.println("<option value=\"-1\" selected> No se le ha registrado una direccion</option>");
+			}
+		} catch (java.io.IOException e1) {
+			System.out.println(e1);
+		}
+	}%>
+					<%
+						menuLocaciones(out, request.getParameter("cb_partner_id"));
+					%>
+				</select>
+			</div>
+		</fieldset>
+		<h2>Entrega</h2>
+		<fieldset>
+			<div class="row">
+				<label id="C_BPartner_Location_IDL" for="C_BPartner_Location_IDF"
+					title="Identifica la direcci&oacute;n para este tercero">
+					Direcci&oacute;n de entrega </label> <select name=dropship_location_id
+					id="dropship_location_id">
+					<%
+						menuLocacionesEnvio(out, request.getParameter("cb_partner_id"));
+					%>
+				</select>
+			</div>
+			<div class="row">
+				<label id="POReferenceL" for="POReferenceF"
+					title="Descripcion">
+					Comentarios </label> <input id="description"
+					value="" name="description" onkeypress="return validar(event)" onpaste="return validar(event)" autocomplete="off" maxlength="250" type="text"/>
+			</div>
+			<div style="visibility: hidden">
+				<label id="M_Warehouse_IDL" for="M_Warehouse_IDF"
+					title="Almac&eacute;n y punto de servicio"> Almac&eacute;n
+				</label> <select name="m_warehouse_id" id="m_warehouse_id">
+					<%!private void menuAlmacen(javax.servlet.jsp.JspWriter out, String m_warehouse_id) {
+		try {
+			MWareHouse_X locImp = new MWareHouse_X();
+			List<MWareHouse> loc = locImp.buscarTodos();
+			Integer i = 0;
+			Integer mWareHouseID = Integer.parseInt(m_warehouse_id);
+			if (mWareHouseID == 1)
+				mWareHouseID = 10000071;
+			if (mWareHouseID == 2)
+				mWareHouseID = 10000072;
+
+			for (MWareHouse l : loc) {
+				i++;
+				if ((l.getM_warehouse_id() - mWareHouseID) == 0) {
+					out.println("<option value=\"" + l.getM_warehouse_id() + "\"selected>" + l.getName() + "</option>");
+				}
+				if ((mWareHouseID - 10000071) == 0) {
+					out.println("<option value=\"10000071\"selected>" + " PECUARIO " + "</option>");
+				} else if ((mWareHouseID - 10000072) == 0) {
+					out.println("<option value=\"10000072\"selected>" + " MASCOTA " + "</option>");
+				} else if ((mWareHouseID - 10000073) == 0) {
+					out.println("<option value=\"10000073\"selected>" + " TROTEMOR " + "</option>");
+				} else if ((mWareHouseID - 10000074) == 0) {
+					out.println("<option value=\"10000074\"selected>" + " EXTRANJERO " + "</option>");
+				} else {
+					out.println("<option value=\"" + l.getM_warehouse_id() + "\">" + l.getName() + "</option>");
+				}
+			}
+			if (i == 0) {
+				out.println("<option value=\"-1\" selected> No se ha encontrado ningun almacen</option>");
+			}
+		} catch (java.io.IOException e1) {
+			System.out.println(e1);
+		}
+	}%>
+					<%
+						menuAlmacen(out, request.getParameter("m_warehouse_id"));
+					%>
+				</select>
+			</div>
+			<script type="text/javascript">
+				function direccion($i) {
+					if ($i == 'S') {
+						document.getElementById('dropship_location_id').style.visibility = 'hidden';
+
+					} else {
+						document.getElementById('dropship_location_id').style.visibility = 'visible';
+					}
+				}
+			</script>
+			<!-- 
+			<div class="row">
+				<label id="C_BPartner_saram" for="C_BPartner_saram"
+					title="Ingresa si el pedido sera en sucursal"> Entregado en
+					sucursal</label> <select onchange="direccion(value)" name=esentregalocal id="esentregalocal">
+					<option value="N" selected>No</option>
+					<option value="S">Si</option>
+				</select>
+			</div>
+			 -->
+			<div class="row">
+				<label id="C_BPartner_saram" for="C_BPartner_saram"
+					title="Ingresa si el pedido sera en sucursal"> Tipo de pago</label>
+				<select name=cpaymentterm id="cpaymentterm">
+					<%!private void menuPaymentTerm(javax.servlet.jsp.JspWriter out, String cbid) {
+		try {
+			CBPartner cb = new CBPartner();
+			CBPartner_X cbx = new CBPartner_X();
+			Integer cbidI = cbid == null ? 0 : Integer.parseInt(cbid);
+			cb = cbx.buscarUno(cbidI);
+			if (cb != null) {
+				
+				if (cb.getSo_creditlimit() > 0 || 
+						
+						cb.getC_bpartner_id()==1004006 ||
+						cb.getC_bpartner_id()==1009000) {
+					
+					out.println("<option value=" + cb.getC_paymentterm_id() + " selected>Credito</option>");
+					out.println("<option value=\"1000001\">Contado</option>");
+					
+				}else if(cb.getC_bpartner_id()==1007517){
+					out.println("<option value=" + cb.getC_paymentterm_id() + " selected>Credito</option>");
+					out.println("<option value=\"1000015\">Contado</option>");
+				}else {
+				
+					out.println("<option value=\"1000001\" selected>Contado</option>");
+				}
+			}
+		} catch (java.io.IOException e1) {
+			System.out.println(e1);
+		}
+	}%>
+					<%
+						menuPaymentTerm(out, request.getParameter("cb_partner_id"));
+					%>
+					<%-- <option value="1000011" selected>Credito</option>
+					<option value="1000001">Contado</option>--%>
+				</select>
+			</div>
+		</fieldset>
+		</div>
+		<%--
+		<h2>Facturación</h2>
+		<fieldset>
+			<div class="row">
+				<label id="InvoiceRuleL" for="InvoiceRuleF"
+					title="Frecuencia y m&eacute;todos de facturaci&oacute;n">
+					Regla de Facturaci&oacute;n </label>
+				<div class="fieldValue">Inmediato</div>
+			</div>
+			<div class="row">
+				<label id="M_PriceList_IDL" for="M_PriceList_IDF"
+					title="Identificador &uacute;nico de mi lista de precios">
+					Lista de Precios </label>
+				<div class="fieldValue">Mayorista</div>
+			</div>
+			<div class="row">
+				<label id="SalesRep_IDL" for="SalesRep_IDF"
+					title="Representante Comercial"> Representante Comercial </label>
+				<div class="fieldValue">Asturias Flores, Juan Francisco</div>
+			</div>
+			<div class="row">
+				<label id="C_PaymentTerm_IDL" for="C_PaymentTerm_IDF"
+					title="Condiciones de pago de esta transacci&oacute;n">
+					T&eacute;rmino de Pago </label>
+				<div class="fieldValue">12 dias</div>
+			</div>
+		</fieldset>
+		 --%>
+		<!-- <h2>Estado</h2>
+		<fieldset>
+			<div class="row">
+				<label id="TotalLinesL" for="TotalLinesF"
+					title="Total de todas las l&iacute;neas del documento">
+					Total de L&iacute;neas </label>
+				<div class="fieldValue">0.0</div>
+			</div>
+			<div class="row">
+				<label id="GrandTotalL" for="GrandTotalF"
+					title="Total del documento"> Gran Total </label>
+				<div class="fieldValue">0.0</div>
+			</div>
+			<div class="row">
+				<label id="DocStatusL" for="DocStatusF"
+					title="El estado actual del documento"> Estado del
+					Documento </label>
+				<div class="fieldValue">
+					<input value="Borrador" disabled="true" id="docStatus"
+						name="docstatus" />
+				</div>
+			</div>
+		</fieldset> -->
+		<div id='ventana-flotante' class='oculto'>
+			<div id='contenedor'>
+				<div class='contenido'>
+					<div align="center">
+						<input type="submit" class="greenButton" name="guardarpedido"
+							value="GUARDAR PEDIDO" id="btnLeft" /><input type="button"
+							class="whiteButton" value="Cancelar" onclick="ocultar()">
+					</div>
+					<div id="alerta" class="alert">
+						<b>&#191;Esta seguro que la siguiente informacion es correcta?</b><br>
+						<br> Cliente:
+						<especial> <em>
+							<%
+								utf8(request.getParameter("cb_partner_id"), out);
+							%>
+						</em></especial>
+						<br> Direccion del cliente:
+						<especial> <em><especial id="dircliente"></especial></em></especial>
+						<p id="direntregal">
+							Direccion de entrega:
+							<especial> <em><especial id="direntrega"></especial></em></especial>
+						</p>
+						Termino de pago:
+						<especial> <em><especial id="terminopago"></especial></em></especial>
+						</p>
+
+						<!-- 	<%cpaymentterm(out, request.getParameter("cb_partner_id"));%> -->
+					</div>
+					<em><especial id="faltadireccion"></especial></em><br> <br>
+				</div>
+			</div>
+		</div>
+		</div>
+		<%!private void cpaymentterm(javax.servlet.jsp.JspWriter out, String request) {
+		sqlHQL_X sqlHql = new sqlHQL_X();
+		List value = sqlHql.buscarUno("select name from c_paymentterm where c_paymentterm_id= "
+				+ "(select c_paymentterm_id from c_bpartner where c_bpartner_id =" + request + ")");
+		try {
+			if (value.get(0) != null) {
+				out.println("<especial> <em>" + value.get(0).toString() + "</em></especial>");
+			}
+		} catch (java.io.IOException e1) {
+			System.out.println(e1);
+		}
+	}%>
+		<script type="text/javascript">
+			function mostrar() {
+				document.getElementById('ventana-flotante').className = 'mostrar';
+				document.getElementById('botonAlerta').style.display = 'none';
+				var theSelect = screen1.c_bpartner_location_id;
+				var theSelectD = screen1.dropship_location_id;
+				var theSelectE = screen1.cpaymentterm;
+				var dircliente = document.getElementById('dircliente');
+				var direntrega = document.getElementById('direntrega');
+				var terminopago = (theSelectE[theSelectE.selectedIndex].text);
+				dircliente.innerHTML = (theSelect[theSelect.selectedIndex].text);
+				direntrega.innerHTML = (theSelectD[theSelectD.selectedIndex].text);
+				if (theSelectD[theSelectD.selectedIndex].text.length > 0) {
+					document.getElementById('btnLeft').style.display = 'block';
+					document.getElementById('alerta').style.display = 'block';
+				 	document.getElementById('regresarboton').style.display = 'none';
+					document.getElementById('terminopago').innerHTML = terminopago;
+				} else {
+					document.getElementById('faltadireccion').innerHTML = '<b style="color:red;">Informacion insuficiente del cliente, favor seleccione la direccion de entrega</b>'
+					document.getElementById('btnLeft').style.display = 'none';
+					document.getElementById('alerta').style.display = 'none';
+				}
+			}
+			function ocultar() {
+				document.getElementById('ventana-flotante').className = 'oculto';
+				document.getElementById('botonAlerta').style.display = 'block';
+				document.getElementById('regresarboton').style.display = 'block';
+			}
+		</script>
+		<input id="botonAlerta" type="button" class="greenButton"
+			value="GUARDAR DATOS" onclick="mostrar()">
+	</form>
+	<div class="toolbar">
+		<a href="pedido?ad_user_id=<%=request.getParameter("ad_user_id")%>"
+			class=blueButtonRegresar id="regresarboton">Regresar</a>
+		<h1 id="pageTitle"></h1>
+		<!-- <a href="/mobile/WMenu" target="_self" class="button"> Menu </a> <a
+			id="previousButton" target="_self" href="pedido?usuario=0"
+			class="button"> Atras </a> -->
+	</div>
+	<div class="footer"></div>
+</body>
+</html>

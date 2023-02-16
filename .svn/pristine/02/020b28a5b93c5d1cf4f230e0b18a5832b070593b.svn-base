@@ -1,0 +1,7 @@
+package org.saram.accesos;
+
+import org.saram.modelo.MPromocionLine;
+
+public interface MPromocionLine_I {
+	public MPromocionLine buscarTodos(Integer mpromoid);
+}

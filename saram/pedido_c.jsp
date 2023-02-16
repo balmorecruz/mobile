@@ -1,0 +1,160 @@
+<%@page import="org.saram.busquedas.utilerias"%>
+<%@page contentType="text/html" import="org.saram.accesos.COrder_X"%>
+<%@page contentType="text/html" import="org.saram.modelo.COrder"%>
+<%@page contentType="text/html" import="org.saram.accesos.COrderLine_X"%>
+<%@page contentType="text/html" import="org.saram.modelo.COrderLine"%>
+<%@page contentType="text/html" import="org.saram.accesos.CBPartner_X"%>
+<%@page contentType="text/html" import="org.saram.modelo.CBPartner"%>
+<%@page contentType="text/html" import="org.saram.accesos.MProduct_X"%>
+<%@page contentType="text/html" import="org.saram.modelo.MProduct"%>
+<%@page contentType="text/html" import="java.text.DecimalFormat"%>
+<%@page contentType="text/html" import="java.util.*"%>
+<%@page contentType="text/html"
+	import="javax.servlet.http.HttpServletRequest"%>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Expires" content="0" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>Inicio</title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/iui/iui.css" type="text/css" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/recursos/saram.css"
+	type="text/css" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/bootstrap-theme.css"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/iui/t/default/default-theme.css"
+	type="text/css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="application/x-javascript"
+	src="${pageContext.request.contextPath}/iui/iui.js"></script>
+<script type="text/javascript">
+	history.forward();
+</script>
+</head>
+<body>
+	<div class="toolbar">
+
+
+		<h1 id="pageTitle"></h1>
+	</div>
+	<form id="screen1" title="Mobile Saram" name="formname"
+		action="${pageContext.request.contextPath}/acceso?c_order_id=<%=request.getParameter("c_order_id")%>"
+		method="post" selected="true">
+		<fieldset>
+			<%!private void informacionPedido(javax.servlet.jsp.JspWriter out, String COrder, String solicitud) {
+		COrder_X cox = new COrder_X();
+		COrderLine_X colx = new COrderLine_X();
+		CBPartner_X cbx = new CBPartner_X();
+		MProduct_X mpx = new MProduct_X();
+		COrder co = new COrder();
+		utilerias ut = new utilerias();
+		List<COrderLine> col;
+		CBPartner cb = new CBPartner();
+		MProduct mp = new MProduct();
+		try {
+			DecimalFormat df = new DecimalFormat("###,###,##0.00");
+			co = cox.buscarUno(Integer.parseInt(COrder));
+			col = colx.buscarTodos(co.getC_order_id());
+			cb = cbx.buscarUno(co.getC_bpartner_id());
+			out.println(
+					"<div class=\"table-responsive\"><table class=\"table\" style=\"table-layout: fixed;\"></br><b>PEDIDO N°: "
+							+ co.getDocumentno() + "</b></br></br>");
+			out.println("<b>Cliente: " + cb.getName() + "</b></br></br>");
+			//out.println("</br>");out.println("</br>");
+			out.println(
+					"<thead class=\"thead-inverse\"><tr><th>#</th><th>Producto</th><th>Cantidad</th><th>Precio Unitario</th><th>Subtotal</th></tr></thead><tbody>");
+			//out.println("<tr><th>Productos:<th><tr>");
+			//out.println("</br>");
+			Integer cuenta = 0;
+			for (COrderLine c : col) {
+				cuenta = cuenta + 1;
+				if (c.getM_product_id() != null) {
+					mp = mpx.buscarUno(c.getM_product_id());
+					if ((c.getQtyentered() * c.getPriceactual() >= 0.30)) {
+						out.println("<tr><th scope=\"row\">" + cuenta + "</th><td>" + mp.getName() + "</td><td>"
+								+ c.getQtyentered() + "</td><td>$" + c.getPriceactual() + "</td><td>$"
+								+ ut.decimalMiles(c.getQtyentered() * c.getPriceactual()) + "</td></tr>");
+					} else {
+						out.println("<tr><th scope=\"row\">" + cuenta + "</th><td>" + mp.getName() + "</td><td>"
+								+ c.getQtyentered() + "</td><td>$" + c.getQtyentered() + "</td><td>$"
+								+ df.format(c.getQtyentered() * c.getPriceactual()) + "</td><tr>");
+					}
+				} else {
+					if (c.getC_charge_id() != 1004412) {
+						out.println("<tr><th scope=\"row\">" + cuenta + "</th><td> Cobro de Flete </td><td>"
+								+ c.getQtyentered() + "</td><td>$" + c.getPriceactual() + "</td><td>$"
+								+ df.format(c.getQtyentered() * c.getPriceactual()) + "</td></th>");
+					} else {
+						out.println("<tr><th scope=\"row\">" + cuenta + "</th><td> Cuota AVE </td><td>"
+								+ c.getQtyentered() + "</td><td>$" + c.getPriceactual() + "</td><td>$"
+								+ df.format(c.getQtyentered() * c.getPriceactual()) + "</td></th>");
+					}
+				}
+			}
+			if (cb.getLco_isic_id() == 1000417 && cb.getLco_taxpayertype_id() == 1000006 && co.getTotallines() > 100
+					|| cb.getLco_isic_id() == 1000417 && cb.getLco_taxpayertype_id() == 1000007
+							&& co.getTotallines() > 100) {
+				if (co.getGrandtotal() > co.getTotallines()) {
+					out.println("</tbody><tfoot><tr><th colspan=\"3\">Total sin IVA: </th><th colspan=\"2\">$"
+							+ ut.decimalMiles(co.getTotallines()) + "</th><tr>");
+					if (cb.getLco_isic_id() == 1000417 && cb.getLco_taxpayertype_id() == 1000006
+							&& co.getTotallines() > 100
+							|| cb.getLco_isic_id() == 1000417 && cb.getLco_taxpayertype_id() == 1000007
+									&& co.getTotallines() > 100) {
+						Float monto = co.getGrandtotal() + (co.getTotallines() * new Float(0.01));
+						out.println("</tbody><tfoot><tr><th colspan=\"3\">Total Percepcion: </th><th colspan=\"2\">$"
+								+ co.getTotallines() * new Float(0.01) + "</th><tr>");
+						out.println("<tr><th colspan=\"3\">Total a pagar: </th><th colspan=\"2\">$"
+								+ (ut.decimalMiles(monto)) + "</th><tr></tfoot></table></div>");
+					} else {
+						if (cb.getLco_isic_id() == 1000417 && cb.getLco_taxpayertype_id() == 1000006
+								&& co.getTotallines() > 100
+								|| cb.getLco_isic_id() == 1000417 && cb.getLco_taxpayertype_id() == 1000007
+										&& co.getTotallines() > 100) {
+							out.println(
+									"</tbody><tfoot><tr><th colspan=\"3\">Total Percepcion: </th><th colspan=\"2\">$"
+											+ co.getTotallines() * new Float(0.01) + "</th><tr>");
+							out.println("<tr><th colspan=\"3\">Total a pagar: </th><th colspan=\"2\">$"
+									+ (ut.decimalMiles(co.getGrandtotal()) + df.format(co.getTotallines() * 0.01))
+									+ "</th><tr></tfoot></table></div>");
+						} else {
+							out.println("<tr><th colspan=\"3\">Total a pagar: </th><th colspan=\"2\">$"
+									+ ut.decimalMiles(co.getGrandtotal()) + "</th><tr></tfoot></table></div>");
+						}
+					}
+				}
+			} else {
+				out.println("</tbody><tfoot><tr><th colspan=\"3\">Total a pagar: </th><th colspan=\"2\">$"
+						+ ut.decimalMiles(co.getGrandtotal()) + "</th><tr></tfoot></table></div>");
+			}
+
+			if (solicitud.equals("0")) {
+				out.println(
+						"<div class=\"alert alert-success\">Se ha enviado automáticamente al correo del área de facturación y además una notificación "
+								+ "al correo de cliente con la información del pedido.</div>");
+			} else {
+				out.println(
+						"<div class=\"alert alert-danger\">Se ha enviado un correo al area de creditos y cobros para su aprobacion.</div>");
+			}
+		} catch (java.io.IOException e1) {
+			System.out.println("Exception encontrada");
+		}
+	}%>
+			<%
+				informacionPedido(out, request.getParameter("c_order_id"), request.getParameter("solicitud"));
+			%>
+		</fieldset>
+		<div align="center">
+			<input align="center" type="submit" class="whiteButton"
+				name="entrar1" value="HACER UN NUEVO PEDIDO" id="btnLeft" />
+		</div>
+	</form>
+</body>
+</html>

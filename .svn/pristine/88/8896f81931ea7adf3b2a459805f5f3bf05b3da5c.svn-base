@@ -1,0 +1,64 @@
+package org.saram.modelo;
+
+import java.sql.Timestamp;
+
+public class CInvoice {
+	
+	private Integer c_invoice_id;
+	private Timestamp created;
+	private Timestamp updated;
+	private Timestamp dateinvoiced;
+	private Timestamp dateacct;
+	private String docaction;
+	private String docstatus;
+	private Integer c_order_id;
+	
+	public Integer getC_invoice_id() {
+		return c_invoice_id;
+	}
+	public void setC_invoice_id(Integer c_invoice_id) {
+		this.c_invoice_id = c_invoice_id;
+	}
+	public Timestamp getCreated() {
+		return created;
+	}
+	public void setCreated(Timestamp created) {
+		this.created = created;
+	}
+	public Timestamp getUpdated() {
+		return updated;
+	}
+	public void setUpdated(Timestamp updated) {
+		this.updated = updated;
+	}
+	public Timestamp getDateinvoiced() {
+		return dateinvoiced;
+	}
+	public void setDateinvoiced(Timestamp dateinvoiced) {
+		this.dateinvoiced = dateinvoiced;
+	}
+	public Timestamp getDateacct() {
+		return dateacct;
+	}
+	public void setDateacct(Timestamp dateacct) {
+		this.dateacct = dateacct;
+	}
+	public Integer getC_order_id() {
+		return c_order_id;
+	}
+	public void setC_order_id(Integer c_order_id) {
+		this.c_order_id = c_order_id;
+	}
+	public String getDocaction() {
+		return docaction;
+	}
+	public void setDocaction(String docaction) {
+		this.docaction = docaction;
+	}
+	public String getDocstatus() {
+		return docstatus;
+	}
+	public void setDocstatus(String docstatus) {
+		this.docstatus = docstatus;
+	}
+}

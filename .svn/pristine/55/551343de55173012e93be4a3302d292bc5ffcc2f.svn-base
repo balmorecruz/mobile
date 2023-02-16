@@ -1,0 +1,314 @@
+package org.saram.accesos;
+
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.saram.controladores.HibernateUtil;
+import org.saram.modelo.AdUser;
+import org.saram.modelo.COrder;
+
+public class COrder_X implements COrder_I {
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<COrder> buscarTodos(AdUser ad) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("createdby", ad.getAd_user_id()))
+					.add(Restrictions.eq("issotrx", "Y"))
+					.add(Restrictions.eq("esdeudor", "N"))
+					.add(Restrictions.eq("updatedby", ad.getAd_user_id()))
+					.add(Restrictions.eq("processed", "N"));
+			List<COrder> lista = crit.list();
+			sesion.close();
+			return lista;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	
+//	//Aqui debo revibir el salesrep y listar solo aduser
+//	public List<COrder> buscarTodosPorCliente(Integer CBPartner) {
+//		Session sesion;
+//		try {
+//			sesion = HibernateUtil.getSessionFactory().openSession();
+//		} catch (Exception e) {
+//			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+//		}
+//		try {
+//			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("c_bpartner_id", ad.getAd_user_id()))
+//					.add(Restrictions.eq("issotrx", "Y"))
+//					.add(Restrictions.eq("esdeudor", "N"))
+////					.add(Restrictions.eq("updatedby", ad.getAd_user_id()))
+//					.add(Restrictions.eq("processed", "N"));
+//			List<COrder> lista = crit.list();
+//			sesion.close();
+//			return lista;
+//		} catch (Exception e) {
+//			System.out.println(e.toString());
+//			sesion.close();
+//			return null;
+//		}
+//	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<COrder> buscarTodosProcesados(AdUser ad) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+//			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("createdby", ad.getAd_user_id()))
+//					.add(Restrictions.eq("issotrx", "Y"))
+//					.add(Restrictions.eq("processed", "Y"))
+//					.add(Subqueries.propertyNotIn("c_order_id", DetachedCriteria.forClass(CInvoice.class)
+//							.add(Restrictions.eq("docstatus", "CO"))
+//							.add(Restrictions.eq("docaction", "CL"))
+//							.setProjection(Property.forName("c_order_id"))
+//							));
+//			Query query=sesion.createQuery(
+//					"from COrder co");
+			Query query=          sesion.createQuery(
+					"from COrder as co where (co.issotrx = 'Y' and docstatus <> 'CL' and co.processed='Y' and co.createdby = :aduserid and co.c_order_id not in"
+					+ " (select b.c_order_id from CInvoice b where co.c_order_id = b.c_order_id and b.docstatus='CO' and docaction='CL')) "
+					+ "and co.docstatus NOT IN ('IN', 'CO') AND DOCACTION = 'CO' "
+					+ " or "
+					+ "(co.issotrx = 'Y' and co.processed='N' and iscreditapproved = 'Y' and docstatus <> 'CL' and co.createdby = :aduserid and co.c_order_id not in"
+					+ " (select b.c_order_id from CInvoice b where co.c_order_id = b.c_order_id and b.docstatus='CO' and docaction='CL'))"
+					+ " and co.docstatus <> 'IN' AND DOCACTION ='CO'");
+			query.setParameter("aduserid",ad.getAd_user_id());
+			List<COrder> lista = query.list();
+			sesion.close();
+			return lista;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<COrder> buscarTodosPorFacturar(AdUser ad) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("createdby", ad.getAd_user_id()))
+					.add(Restrictions.eq("issotrx", "Y"))
+					.add(Restrictions.eq("processed", "Y"));
+			List<COrder> lista = crit.list();
+			sesion.close();
+			return lista;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<COrder> buscarTodosDetenidos(AdUser ad) {
+
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("createdby", ad.getAd_user_id()))
+					.add(Restrictions.eq("issotrx", "Y"))
+					.add(Restrictions.eq("iscreditapproved", "N"))
+					.add(Restrictions.eq("esdeudor", "Y"))
+					.add(Restrictions.not((Restrictions.eq("docstatus", "VO"))))
+//					.add(Restrictions.ne("updatedby", ad.getAd_user_id()))
+					.add(Restrictions.eq("processed", "N"));
+			List<COrder> lista = crit.list();
+			sesion.close();
+			return lista;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<COrder> buscarUnoDetenido(String adId, String coID) {
+
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("createdby", Integer.parseInt(adId)))
+					.add(Restrictions.eq("issotrx", "Y"))
+					.add(Restrictions.eq("c_order_id", Integer.parseInt(coID)))
+					.add(Restrictions.eq("iscreditapproved", "N"))
+					.add(Restrictions.eq("esdeudor", "Y"))
+//					.add(Restrictions.ne("updatedby", ad.getAd_user_id()))
+					.add(Restrictions.eq("processed", "N"));
+			List<COrder> lista = crit.list();
+			sesion.close();
+			return lista;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	@Override
+	public Long salvarOrden(COrder co) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		Transaction tx = sesion.beginTransaction();
+		try{
+			sesion.saveOrUpdate(co);
+			tx.commit();
+			sesion.close();
+		}catch(Exception e){
+			System.out.println(e);
+			sesion.close();
+			sesion.saveOrUpdate(co);
+			tx.commit();
+		}
+		return null;
+	}
+	
+	@Override
+	public Integer buscarMaximo() {
+		Session sesion;
+		Integer value = 0;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrder.class).setProjection(Projections.max("c_order_id"));
+			@SuppressWarnings("rawtypes")
+			List lista = crit.list();
+			sesion.close();
+			if (lista.get(0)!=null){
+				value = Integer.parseInt(lista.get(0).toString()) + 1;
+			}
+			return value;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+
+	@Override
+	public COrder buscarUno(Integer id) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("c_order_id", id));
+			@SuppressWarnings("unchecked")
+			List<COrder> lista = crit.list();
+			sesion.close();
+			return lista.get(0);
+		} catch (Exception e) {
+			sesion.close();
+			return null;
+		}
+	}
+	
+	public Long eliminarUno(Integer id) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
+		try{
+			COrder col = buscarUno(id);
+			session.delete(col);
+			tx.commit();
+			session.close();
+			return null;
+		}catch (Exception e){
+			System.out.println(e.toString());
+			session.close();
+			return null;
+		}
+	}
+	@Override
+	public List<COrder> buscarTodosEnSaram(AdUser ad) {
+		Session sesion;
+		try {
+			sesion = HibernateUtil.getSessionFactory().openSession();
+		} catch (Exception e) {
+			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+		}
+		try {
+			Query query=          sesion.createQuery(
+					"from COrder as co where (co.issotrx = 'Y' and co.processed='Y' and co.createdby = :aduserid and co.c_order_id in"
+					+ " (select b.c_order_id from CInvoice b where co.c_order_id = b.c_order_id and b.docstatus='CO' and docaction='CL')) or "
+					+ "(co.issotrx = 'Y' and co.processed='N' and iscreditapproved = 'Y' and co.createdby = :aduserid and co.c_order_id in"
+					+ " (select b.c_order_id from CInvoice b where co.c_order_id = b.c_order_id and b.docstatus='CO' and docaction='CL')) order by co.created desc");
+			query.setMaxResults(30);
+			query.setParameter("aduserid",ad.getAd_user_id());
+			List<COrder> lista = query.list();
+//			List<COrder> lista = crit.list();
+			sesion.close();
+			return lista;
+		} catch (Exception e) {
+			System.out.println(e.toString());
+			sesion.close();
+			return null;
+		}
+	}
+	
+	
+//	@Override
+//	public Long salvarMaximo() {
+//		Session sesion;
+//		try {
+//			sesion = HibernateUtil.getSessionFactory().openSession();
+//		} catch (Exception e) {
+//			sesion = HibernateUtil.getSessionFactory().getCurrentSession();
+//		}
+//		try {
+//			Criteria crit = sesion.createCriteria(COrder.class).add(Restrictions.eq("createdby", ad.getAd_user_id()))
+//					.add(Restrictions.eq("issotrx", "Y"));
+//			List<COrder> lista = crit.list();
+//			sesion.close();
+//			// HibernateUtil.shutdown();
+//			return lista;
+//		} catch (Exception e) {
+//			System.out.println(e.toString());
+//			sesion.close();
+//			HibernateUtil.shutdown();
+//			return null;
+//		}
+//	}
+	
+}

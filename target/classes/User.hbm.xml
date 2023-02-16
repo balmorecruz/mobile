@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+	<class name="org.saram.modelo.AdUser" table="ad_user">
+		<id name="ad_user_id" column="ad_user_id" type="integer"></id>
+		<property name="c_bpartner_id" column="c_bpartner_id"
+			type="integer"></property>
+		<property name="name" column="name" type="string"></property>
+		<property name="password" column="password" type="string"></property>
+		<property name="value" column="value" type="string"></property>
+	</class>
+	<class name="org.saram.modelo.AdSequence" table="ad_sequence">
+		<id name="ad_sequence_id" column="ad_sequence_id" type="integer"></id>
+		<property name="currentnext" column="currentnext"
+			type="integer"></property>
+		<property name="currentnextsys" column="currentnextsys"
+			type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.CBPartner" table="c_bpartner">
+		<id name="c_bpartner_id" column="c_bpartner_id" type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="name2" column="name2" type="string"></property>
+		<property name="chequenombre" column="chequenombre"
+			type="string"></property>
+		<property name="value" column="value" type="string"></property>
+		<property name="taxid" column="taxid" type="string"></property>
+		<property name="so_creditused" column="so_creditused"
+			type="float"></property>
+		<property name="so_creditlimit" column="so_creditlimit"
+			type="float"></property>
+		<property name="salesrep_id" column="salesrep_id"
+			type="integer"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="iscustomer" column="iscustomer" type="string"></property>
+		<property name="ispromocion" column="ispromocion"
+			type="string"></property>
+		<property name="lco_taxpayertype_id"
+			column="lco_taxpayertype_id" type="integer"></property>
+		<property name="lco_isic_id" column="lco_isic_id"
+			type="integer"></property>
+		<property name="c_paymentterm_id" column="c_paymentterm_id"
+			type="integer"></property>
+		<property name="m_pricelist_id" column="m_pricelist_id"
+			type="integer"></property>
+		<property name="t_clasificacion_id"
+			column="t_clasificacion_id" type="integer"></property>
+		<property name="mas_pricelist_id" column="mas_pricelist_id"
+			type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.COrder" table="c_order"
+		dynamic-insert="true">
+		<id name="c_order_id" column="c_order_id" type="integer"></id>
+		<property name="ad_org_id" column="ad_org_id" type="integer"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="created" column="created" type="timestamp"></property>
+		<property name="createdby" column="createdby" type="integer"></property>
+		<property name="updated" column="updated" type="timestamp"></property>
+		<property name="updatedby" column="updatedby" type="integer"></property>
+		<property name="issotrx" column="issotrx" type="string"></property>
+		<property name="documentno" column="documentno" type="string"></property>
+		<property name="docstatus" column="docstatus" type="string"></property>
+		<property name="docaction" column="docaction" type="string"></property>
+		<property name="processing" column="processing" type="string"></property>
+		<property name="processed" column="processed" type="string"></property>
+		<property name="c_doctype_id" column="c_doctype_id"
+			type="integer"></property>
+		<property name="c_doctypetarget_id"
+			column="c_doctypetarget_id" type="integer"></property>
+		<property name="description" column="description"
+			type="string"></property>
+		<property name="isapproved" column="isapproved" type="string"></property>
+		<property name="iscreditapproved" column="iscreditapproved"
+			type="string"></property>
+		<property name="isdelivered" column="isdelivered"
+			type="string"></property>
+		<property name="isinvoiced" column="isinvoiced" type="string"></property>
+		<property name="isprinted" column="isprinted" type="string"></property>
+		<property name="istransferred" column="istransferred"
+			type="string"></property>
+		<property name="isselected" column="isselected" type="string"></property>
+		<property name="salesrep_id" column="salesrep_id"
+			type="integer"></property>
+		<property name="dateordered" column="dateordered"
+			type="timestamp"></property>
+		<property name="datepromised" column="datepromised"
+			type="timestamp"></property>
+		<property name="dateprinted" column="dateprinted"
+			type="timestamp"></property>
+		<property name="dateacct" column="dateacct" type="timestamp"></property>
+		<property name="c_bpartner_id" column="c_bpartner_id"
+			type="integer"></property>
+		<property name="c_bpartner_location_id"
+			column="c_bpartner_location_id" type="integer"></property>
+		<property name="poreference" column="poreference"
+			type="string"></property>
+		<property name="isdiscountprinted" column="isdiscountprinted"
+			type="string"></property>
+		<property name="c_currency_id" column="c_currency_id"
+			type="integer"></property>
+		<property name="paymentrule" column="paymentrule"
+			type="string"></property>
+		<property name="c_paymentterm_id" column="c_paymentterm_id"
+			type="integer"></property>
+		<property name="invoicerule" column="invoicerule"
+			type="string"></property>
+		<property name="deliveryrule" column="deliveryrule"
+			type="string"></property>
+		<property name="freightcostrule" column="freightcostrule"
+			type="string"></property>
+		<property name="freightamt" column="freightamt"
+			type="integer"></property>
+		<property name="deliveryviarule" column="deliveryviarule"
+			type="string"></property>
+		<property name="m_shipper_id" column="m_shipper_id"
+			type="integer"></property>
+		<property name="c_charge_id" column="c_charge_id"
+			type="integer"></property>
+		<property name="chargeamt" column="chargeamt" type="integer"></property>
+		<property name="priorityrule" column="priorityrule"
+			type="string"></property>
+		<property name="totallines" column="totallines" type="float"></property>
+		<property name="grandtotal" column="grandtotal" type="float"></property>
+		<property name="m_warehouse_id" column="m_warehouse_id"
+			type="integer"></property>
+		<property name="m_pricelist_id" column="m_pricelist_id"
+			type="integer"></property>
+		<property name="istaxincluded" column="istaxincluded"
+			type="string"></property>
+		<property name="c_campaign_id" column="c_campaign_id"
+			type="integer"></property>
+		<property name="c_project_id" column="c_project_id"
+			type="integer"></property>
+		<property name="c_activity_id" column="c_activity_id"
+			type="integer"></property>
+		<property name="posted" column="posted" type="string"></property>
+		<property name="c_payment_id" column="c_payment_id"
+			type="integer"></property>
+		<property name="c_cashline_id" column="c_cashline_id"
+			type="integer"></property>
+		<property name="sendemail" column="sendemail" type="string"></property>
+		<property name="ad_user_id" column="ad_user_id"
+			type="integer"></property>
+		<property name="copyfrom" column="copyfrom" type="string"></property>
+		<property name="isselfservice" column="isselfservice"
+			type="string"></property>
+		<property name="ad_orgtrx_id" column="ad_orgtrx_id"
+			type="integer"></property>
+		<property name="user1_id" column="user1_id" type="integer"></property>
+		<property name="user2_id" column="user2_id" type="integer"></property>
+		<property name="c_conversiontype_id"
+			column="c_conversiontype_id" type="integer"></property>
+		<property name="bill_bpartner_id" column="bill_bpartner_id"
+			type="integer"></property>
+		<property name="bill_location_id" column="bill_location_id"
+			type="integer"></property>
+		<property name="bill_user_id" column="bill_user_id"
+			type="integer"></property>
+		<property name="pay_bpartner_id" column="pay_bpartner_id"
+			type="integer"></property>
+		<property name="pay_location_id" column="pay_location_id"
+			type="integer"></property>
+		<property name="ref_order_id" column="ref_order_id"
+			type="integer"></property>
+		<property name="isdropship" column="isdropship" type="string"></property>
+		<property name="volume" column="volume" type="float"></property>
+		<property name="weight" column="weight" type="float"></property>
+		<property name="ordertype" column="ordertype" type="string"></property>
+		<property name="c_pos_id" column="c_pos_id" type="integer"></property>
+		<property name="amounttendered" column="amounttendered"
+			type="float"></property>
+		<property name="amountrefunded" column="amountrefunded"
+			type="float"></property>
+		<property name="link_order_id" column="link_order_id"
+			type="integer"></property>
+		<property name="m_freightcategory_id"
+			column="m_freightcategory_id" type="integer"></property>
+		<property name="dropship_bpartner_id"
+			column="dropship_bpartner_id" type="integer"></property>
+		<property name="dropship_location_id"
+			column="dropship_location_id" type="integer"></property>
+		<property name="dropship_user_id" column="dropship_user_id"
+			type="integer"></property>
+		<property name="promotioncode" column="promotioncode"
+			type="string"></property>
+		<property name="c_ordersource_id" column="c_ordersource_id"
+			type="integer"></property>
+		<property name="processedon" column="processedon"
+			type="float"></property>
+		<property name="lco_taxpayertype_id"
+			column="lco_taxpayertype_id" type="integer"></property>
+		<property name="v_liability_acct" column="v_liability_acct"
+			type="integer"></property>
+		<property name="convertir_cotizacion"
+			column="convertir_cotizacion" type="string"></property>
+		<property name="generar_factura" column="generar_factura"
+			type="string"></property>
+		<property name="contribuyente" column="contribuyente"
+			type="string"></property>
+		<property name="puestoen" column="puestoen" type="string"></property>
+		<property name="placa" column="placa" type="string"></property>
+		<property name="tipoflete" column="tipoflete" type="string"></property>
+		<property name="entrega" column="entrega" type="string"></property>
+		<property name="recibe" column="recibe" type="string"></property>
+		<property name="fletetrans" column="fletetrans" type="float"></property>
+		<property name="totaluni" column="totaluni" type="float"></property>
+		<property name="totalfc" column="totalfc" type="float"></property>
+		<property name="fpminimo" column="fpminimo" type="float"></property>
+		<property name="transporte" column="transporte" type="string"></property>
+		<property name="generar_orden" column="generar_orden"
+			type="string"></property>
+		<property name="c_opportunity_id" column="c_opportunity_id"
+			type="integer"></property>
+		<property name="vapor" column="vapor" type="string"></property>
+		<property name="almacenadora" column="almacenadora"
+			type="string"></property>
+		<property name="humedad" column="humedad" type="float"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="esentregalocal" column="esentregalocal"
+			type="string"></property>
+		<property name="esdeudor" column="esdeudor" type="string"></property>
+		<property name="escorreoenviado" column="escorreoenviado"
+			type="string"></property>
+		<property name="escorreoenviadocyb"
+			column="escorreoenviadocyb" type="string"></property>
+		<property name="escorreoenviadop" column="escorreoenviadop"
+			type="string"></property>
+		<property name="isproforma" column="isproforma" type="string"></property>
+		<property name="c_orderp_id" column="c_orderp_id"
+			type="integer"></property>
+		<one-to-one name="C_invoice"></one-to-one>
+	</class>
+	<class name="org.saram.modelo.CBPartnerLocation"
+		table="c_bpartner_location">
+		<id name="c_bpartner_location_id" column="c_bpartner_location_id"
+			type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="c_bpartner_id" column="c_bpartner_id"
+			type="integer"></property>
+		<property name="c_location_id" column="c_location_id"
+			type="integer"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+	</class>
+	<class name="org.saram.modelo.CCharge" table="c_charge">
+		<id name="c_charge_id" column="c_charge_id" type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="description" column="description"
+			type="string"></property>
+		<property name="istaxincluded" column="istaxincluded"
+			type="string"></property>
+		<property name="chargeamt" column="chargeamt" type="float"></property>
+		<property name="c_city_id" column="c_city_id" type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.CDocType" table="c_doctype">
+		<id name="c_doctype_id" column="c_doctype_id" type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.CLocation" table="c_location">
+		<id name="c_location_id" column="c_location_id" type="integer"></id>
+		<property name="c_city_id" column="c_city_id" type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.COrderLine" table="c_orderline"
+		dynamic-insert="true">
+		<id name="c_orderline_id" column="c_orderline_id" type="integer"></id>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="ad_org_id" column="ad_org_id" type="integer"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="created" column="created" type="timestamp"></property>
+		<property name="createdby" column="createdby" type="integer"></property>
+		<property name="updated" column="updated" type="timestamp"></property>
+		<property name="updatedby" column="updatedby" type="integer"></property>
+		<property name="c_order_id" column="c_order_id"
+			type="integer"></property>
+		<property name="line" column="line" type="integer"></property>
+		<property name="c_bpartner_id" column="c_bpartner_id"
+			type="integer"></property>
+		<property name="c_bpartner_location_id"
+			column="c_bpartner_location_id" type="integer"></property>
+		<property name="dateordered" column="dateordered"
+			type="timestamp"></property>
+		<property name="datepromised" column="datepromised"
+			type="timestamp"></property>
+		<property name="datedelivered" column="datedelivered"
+			type="timestamp"></property>
+		<property name="dateinvoiced" column="dateinvoiced"
+			type="timestamp"></property>
+		<property name="description" column="description"
+			type="string"></property>
+		<property name="m_product_id" column="m_product_id"
+			type="integer"></property>
+		<property name="m_warehouse_id" column="m_warehouse_id"
+			type="integer"></property>
+		<property name="c_uom_id" column="c_uom_id" type="integer"></property>
+		<property name="qtyordered" column="qtyordered" type="float"></property>
+		<property name="qtyreserved" column="qtyreserved"
+			type="float"></property>
+		<property name="qtydelivered" column="qtydelivered"
+			type="float"></property>
+		<property name="qtyinvoiced" column="qtyinvoiced"
+			type="float"></property>
+		<property name="qtypendiente" column="qtypendiente"
+			type="float"></property>
+		<property name="m_shipper_id" column="m_shipper_id"
+			type="integer"></property>
+		<property name="c_currency_id" column="c_currency_id"
+			type="integer"></property>
+		<property name="pricelist" column="pricelist" type="float"></property>
+		<property name="priceactual" column="priceactual"
+			type="float"></property>
+		<property name="pricelimit" column="pricelimit" type="float"></property>
+		<property name="linenetamt" column="linenetamt" type="float"></property>
+		<property name="discount" column="discount" type="float"></property>
+		<property name="freightamt" column="freightamt" type="float"></property>
+		<property name="c_charge_id" column="c_charge_id"
+			type="integer"></property>
+		<property name="c_tax_id" column="c_tax_id" type="integer"></property>
+		<property name="s_resourceassignment_id"
+			column="s_resourceassignment_id" type="integer"></property>
+		<property name="ref_orderline_id" column="ref_orderline_id"
+			type="integer"></property>
+		<property name="m_attributesetinstance_id"
+			column="m_attributesetinstance_id" type="integer"></property>
+		<property name="isdescription" column="isdescription"
+			type="string"></property>
+		<property name="processed" column="processed" type="string"></property>
+		<property name="qtyentered" column="qtyentered" type="float"></property>
+		<property name="priceentered" column="priceentered"
+			type="float"></property>
+		<property name="c_project_id" column="c_project_id"
+			type="integer"></property>
+		<property name="pricecost" column="pricecost" type="float"></property>
+		<property name="qtylostsales" column="qtylostsales"
+			type="float"></property>
+		<property name="c_projectphase_id" column="c_projectphase_id"
+			type="integer"></property>
+		<property name="c_projecttask_id" column="c_projecttask_id"
+			type="integer"></property>
+		<property name="rrstartdate" column="rrstartdate"
+			type="timestamp"></property>
+		<property name="rramt" column="rramt" type="float"></property>
+		<property name="c_campaign_id" column="c_campaign_id"
+			type="integer"></property>
+		<property name="c_activity_id" column="c_activity_id"
+			type="integer"></property>
+		<property name="user1_id" column="user1_id" type="integer"></property>
+		<property name="user2_id" column="user2_id" type="integer"></property>
+		<property name="ad_orgtrx_id" column="ad_orgtrx_id"
+			type="integer"></property>
+		<property name="link_orderline_id" column="link_orderline_id"
+			type="integer"></property>
+		<property name="pp_cost_collector_id"
+			column="pp_cost_collector_id" type="integer"></property>
+		<property name="m_promotion_id" column="m_promotion_id"
+			type="integer"></property>
+		<property name="destino" column="destino" type="string"></property>
+		<property name="factura" column="factura" type="string"></property>
+		<property name="recibo" column="recibo" type="string"></property>
+		<property name="totalunidades" column="totalunidades"
+			type="float"></property>
+		<property name="isconsumesforecast"
+			column="isconsumesforecast" type="string"></property>
+		<property name="createfrom" column="createfrom" type="string"></property>
+		<property name="createshipment" column="createshipment"
+			type="string"></property>
+		<property name="espromocion" column="espromocion"
+			type="string"></property>
+		<property name="esgeneradoauto" column="esgeneradoauto"
+			type="string"></property>
+		<property name="c_orderline_id_discount"
+			column="c_orderline_id_discount" type="integer"></property>
+		<property name="ispromomix" column="ispromomix"
+			type="string"></property>
+		<property name="withpromo" column="withpromo"
+			type="string"></property>
+	</class>
+	<class name="org.saram.modelo.CPaymentTerm" table="c_paymentterm">
+		<id name="c_paymentterm_id" column="c_paymentterm_id"
+			type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.CTax" table="c_tax">
+		<id name="c_tax_id" column="c_tax_id" type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.MPriceList" table="m_pricelist">
+		<id name="m_pricelist_id" column="m_pricelist_id" type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="istaxincluded" column="istaxincluded"
+			type="string"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+	</class>
+	<class name="org.saram.modelo.MPriceListVersion"
+		table="m_pricelist_version">
+		<id name="m_pricelist_version_id" column="m_pricelist_version_id"
+			type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="m_pricelist_id" column="m_pricelist_id"
+			type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.COrderTax" table="C_OrderTax">
+		<id name="c_order_id" column="c_order_id" type="integer"></id>
+		<property name="c_tax_id" column="c_tax_id" type="integer"></property>
+		<property name="ad_org_id" column="ad_org_id" type="integer"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="created" column="created" type="timestamp"></property>
+		<property name="createdby" column="createdby" type="integer"></property>
+		<property name="updated" column="updated" type="timestamp"></property>
+		<property name="updatedby" column="updatedby" type="integer"></property>
+		<property name="taxbaseamt" column="taxbaseamt" type="float"></property>
+		<property name="taxamt" column="taxamt" type="float"></property>
+		<property name="istaxincluded" column="istaxincluded"
+			type="string"></property>
+	</class>
+	<class name="org.saram.modelo.MProduct" table="m_product">
+		<id name="m_product_id" column="m_product_id" type="integer"></id>
+		<property name="name" column="name" type="string"></property>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="value" column="value" type="string"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="m_product_category_id"
+			column="m_product_category_id" type="integer"></property>
+		<property name="conversionqq" column="conversionqq"
+			type="float"></property>
+		<property name="apply_discount" column="apply_discount"
+			type="string"></property>
+		<property name="freight_discount" column="freight_discount"
+			type="float"></property>
+
+	</class>
+	<class name="org.saram.modelo.MProductPrice"
+		table="m_productprice">
+		<composite-id>
+			<key-property name="m_pricelist_version_id"
+				column="m_pricelist_version_id" type="integer" />
+			<key-property name="m_product_id" column="m_product_id"
+				type="integer" />
+		</composite-id>
+		<property name="pricelist" column="pricelist" type="float"></property>
+		<property name="pricestd" column="pricestd" type="float"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="pricelimit" column="pricelimit" type="float"></property>
+	</class>
+	<class name="org.saram.modelo.MWareHouse" table="m_warehouse">
+		<id name="m_warehouse_id" column="m_warehouse_id" type="integer"></id>
+		<property name="ad_client_id" column="ad_client_id"
+			type="integer"></property>
+		<property name="name" column="name" type="string"></property>
+		<property name="c_location_id" column="c_location_id"
+			type="integer"></property>
+		<property name="value" column="value" type="string"></property>
+	</class>
+	<class name="org.saram.modelo.MPromocion" table="m_promocion">
+		<id name="m_promocion_id" column="m_promocion_id" type="integer"></id>
+		<property name="description" column="description"
+			type="string"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="value" column="value" type="string"></property>
+		<property name="c_bpartner_id" column="c_bpartner_id"
+			type="integer"></property>
+		<property name="m_product_id" column="m_product_id"
+			type="integer"></property>
+		<property name="qtyPromocion" column="qtyPromocionap"
+			type="integer"></property>
+		<property name="m_product_promo_id"
+			column="m_product_promo_id" type="integer"></property>
+		<property name="t_clasificacion_id"
+			column="t_clasificacion_id" type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.CInvoice" table="c_invoice">
+		<id name="c_invoice_id" column="c_invoice_id" type="integer"></id>
+		<property name="created" column="created" type="timestamp"></property>
+		<property name="updated" column="updated" type="timestamp"></property>
+		<property name="dateinvoiced" column="dateinvoiced"
+			type="timestamp"></property>
+		<property name="dateacct" column="dateacct" type="timestamp"></property>
+		<property name="docstatus" column="docstatus" type="string"></property>
+		<property name="docaction" column="docaction" type="string"></property>
+
+		<property name="c_order_id" column="c_order_id"
+			type="integer"></property>
+		<one-to-one name="corder"></one-to-one>
+
+	</class>
+	<class name="org.saram.modelo.MPromocionLine"
+		table="m_promocionline">
+		<id name="m_promocionline_id" column="m_promocionline_id"
+			type="integer"></id>
+		<property name="m_promocion_id" column="m_promocion_id"
+			type="integer"></property>
+		<property name="description" column="description"
+			type="string"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="value" column="value" type="string"></property>
+		<property name="m_product_id" column="m_product_id"
+			type="integer"></property>
+		<property name="qtyPromocion" column="qtyPromocion"
+			type="integer"></property>
+		<property name="t_clasificacion_id"
+			column="t_clasificacion_id" type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.MPromocionSalesRep"
+		table="m_promocionsalesrep">
+		<id name="m_promocionsalesrep_id" column="m_promocionsalesrep_id"
+			type="integer"></id>
+		<property name="m_promocion_id" column="m_promocion_id"
+			type="integer"></property>
+		<property name="c_bpartner_id" column="c_bpartner_id"
+			type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.MPromoClasificacion"
+		table="m_promoclasificacion">
+		<id name="m_promoclasificacion_id" column="m_promoclasificacion_id"
+			type="integer"></id>
+		<property name="m_promocion_id" column="m_promocion_id"
+			type="integer"></property>
+		<property name="name" column="name" type="string"></property>
+		<property name="description" column="description"
+			type="string"></property>
+		<property name="isactive" column="isactive" type="string"></property>
+		<property name="value" column="value" type="string"></property>
+		<property name="t_clasificacion_id"
+			column="t_clasificacion_id" type="integer"></property>
+	</class>
+	<class name="org.saram.modelo.Prepedido" table="c_order"
+		dynamic-insert="true">
+		<id name="c_order_id" column="c_order_id" type="integer"></id>
+		<property name="created" column="created" type="timestamp"></property>
+		<property name="documentno" column="documentno" type="string"></property>
+		<property name="grandtotal" column="grandtotal" type="float"></property>
+	</class>
+</hibernate-mapping>

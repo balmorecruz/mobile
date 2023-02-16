@@ -1,0 +1,9 @@
+package org.saram.accesos;
+
+import java.util.List;
+
+public interface sqlHQL_I {
+	public List<Object> buscarUno(String sql);
+	public int sql(String sql);
+	public int sqlInsert(String sql);
+}
